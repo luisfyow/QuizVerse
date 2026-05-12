@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuizVerse</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<main class="app">
+
+  <!-- HOME -->
+  <section id="home" class="screen active">
+
+    <div class="hero">
+      <span class="badge">Conhecimentos gerais</span>
+
+      <h1>QuizVerse</h1>
+
+      <p>
+        Escolha uma categoria, responda 15 perguntas
+        e teste seu conhecimento.
+      </p>
+    </div>
+
+    <div class="categorias">
+
+      <button class="cat historia" onclick="iniciarQuiz('historia')">
+        <span>🏛️</span>
+        <strong>História</strong>
+        <small>Passado, guerras e civilizações</small>
+      </button>
+
+      <button class="cat geografia" onclick="iniciarQuiz('geografia')">
+        <span>🌎</span>
+        <strong>Geografia</strong>
+        <small>Países, capitais e mapas</small>
+      </button>
+
+      <button class="cat ciencia" onclick="iniciarQuiz('ciencia')">
+        <span>🔬</span>
+        <strong>Ciência</strong>
+        <small>Corpo, espaço e natureza</small>
+      </button>
+
+      <button class="cat esportes" onclick="iniciarQuiz('esportes')">
+        <span>⚽</span>
+        <strong>Esportes</strong>
+        <small>Futebol, atletas e regras</small>
+      </button>
+
+      <button class="cat musica" onclick="iniciarQuiz('musica')">
+        <span>🎵</span>
+        <strong>Música</strong>
+        <small>Notas, artistas e estilos</small>
+      </button>
+
+      <button class="cat gerais" onclick="iniciarQuiz('gerais')">
+        <span>🧠</span>
+        <strong>Gerais</strong>
+        <small>Conhecimentos variados</small>
+      </button>
+
+    </div>
+
+  </section>
+
+  <!-- QUIZ -->
+  <section id="quiz" class="screen">
+
+    <header class="topo">
+
+      <button class="voltar" onclick="voltarHome()">←</button>
+
+      <div>
+        <h2 id="categoriaTitulo">Categoria</h2>
+        <p id="contador">Pergunta 1 de 15</p>
+      </div>
+
+      <div class="status">
+        <div>❤️ <span id="vidas">3</span></div>
+        <div>⏱️ <span id="timer">20</span>s</div>
+        <div>⭐ <span id="pontos">0</span> pts</div>
+      </div>
+
+    </header>
+
+    <div class="progresso">
+      <div id="barra"></div>
+    </div>
+
+    <section class="card">
+      <h3 id="perguntaTexto">Pergunta</h3>
+
+      <div id="alternativas" class="alternativas"></div>
+    </section>
+
+  </section>
+
+  <!-- RESULTADO -->
+  <section id="resultado" class="screen">
+
+    <div class="resultado-card">
+
+      <span class="badge">Resultado final</span>
+
+      <h2 id="resultadoTitulo">Você terminou!</h2>
+
+      <p id="resultadoTexto"></p>
+
+      <div class="resultado-numero">
+        <span id="resultadoAcertos">0</span>/15
+      </div>
+
+      <div class="rank-box">
+        <p>Seu rank</p>
+
+        <h3 id="rankFinal">Bronze</h3>
+
+        <span id="xpFinal">+0 XP</span>
+      </div>
+
+      <p class="recorde">
+        Melhor pontuação:
+        <span id="melhorPontuacao">0</span> pts
+      </p>
+
+      <div id="revisao" class="revisao"></div>
+
+      <button onclick="reiniciarQuiz()">
+        Jogar novamente
+      </button>
+
+      <button class="secundario" onclick="voltarHome()">
+        Escolher outra categoria
+      </button>
+
+    </div>
+
+  </section>
+
+</main>
+
+<script src="script.js"></script>
+
+</body>
+</html>
