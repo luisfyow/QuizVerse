@@ -3,146 +3,266 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>QuizVerse</title>
+  <meta name="description" content="Simulador privado BACEN Técnico com questões CEBRASPE Certo ou Errado.">
+  <meta name="theme-color" content="#080a0d">
+  <title>Foco BACEN — Simulador Técnico</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <noscript>Ative o JavaScript para usar o simulador.</noscript>
 
-<main class="app">
-
-  <!-- HOME -->
-  <section id="home" class="screen active">
-
-    <div class="hero">
-      <span class="badge">Conhecimentos gerais</span>
-
-      <h1>QuizVerse</h1>
-
-      <p>
-        Escolha uma categoria, responda 15 perguntas
-        e teste seu conhecimento.
-      </p>
+  <section id="loginScreen" class="login-screen">
+    <div class="login-card">
+      <div class="brand-mark" aria-hidden="true">B</div>
+      <span class="eyebrow">ÁREA PRIVADA</span>
+      <h1>Seu foco é o BACEN.</h1>
+      <p>Acesse seu ambiente de simulados para Técnico.</p>
+      <form id="loginForm" class="login-form">
+        <label for="password">Senha de acesso</label>
+        <div class="password-wrap">
+          <input id="password" type="password" autocomplete="current-password" placeholder="Digite sua senha" required>
+          <button id="togglePassword" class="icon-button" type="button" aria-label="Mostrar senha">Ver</button>
+        </div>
+        <p id="loginError" class="form-error" role="alert"></p>
+        <button class="button button-primary button-full" type="submit">Entrar no simulador</button>
+      </form>
+      <small>Seus resultados ficam salvos somente neste navegador.</small>
     </div>
-
-    <div class="categorias">
-
-      <button class="cat historia" onclick="iniciarQuiz('historia')">
-        <span>🏛️</span>
-        <strong>História</strong>
-        <small>Passado, guerras e civilizações</small>
-      </button>
-
-      <button class="cat geografia" onclick="iniciarQuiz('geografia')">
-        <span>🌎</span>
-        <strong>Geografia</strong>
-        <small>Países, capitais e mapas</small>
-      </button>
-
-      <button class="cat ciencia" onclick="iniciarQuiz('ciencia')">
-        <span>🔬</span>
-        <strong>Ciência</strong>
-        <small>Corpo, espaço e natureza</small>
-      </button>
-
-      <button class="cat esportes" onclick="iniciarQuiz('esportes')">
-        <span>⚽</span>
-        <strong>Esportes</strong>
-        <small>Futebol, atletas e regras</small>
-      </button>
-
-      <button class="cat musica" onclick="iniciarQuiz('musica')">
-        <span>🎵</span>
-        <strong>Música</strong>
-        <small>Notas, artistas e estilos</small>
-      </button>
-
-      <button class="cat gerais" onclick="iniciarQuiz('gerais')">
-        <span>🧠</span>
-        <strong>Gerais</strong>
-        <small>Conhecimentos variados</small>
-      </button>
-
-    </div>
-
   </section>
 
-  <!-- QUIZ -->
-  <section id="quiz" class="screen">
-
-    <header class="topo">
-
-      <button class="voltar" onclick="voltarHome()">←</button>
-
-      <div>
-        <h2 id="categoriaTitulo">Categoria</h2>
-        <p id="contador">Pergunta 1 de 15</p>
-      </div>
-
-      <div class="status">
-        <div>❤️ <span id="vidas">3</span></div>
-        <div>⏱️ <span id="timer">20</span>s</div>
-        <div>⭐ <span id="pontos">0</span> pts</div>
-      </div>
-
+  <div id="app" class="app hidden">
+    <header class="topbar">
+      <a class="brand" href="#" data-screen="dashboard" aria-label="Ir para o painel">
+        <span class="brand-mark brand-mark-small">B</span>
+        <span><strong>Foco BACEN</strong><small>Técnico</small></span>
+      </a>
+      <nav class="nav" aria-label="Navegação principal">
+        <button class="nav-link active" data-screen="dashboard">Desempenho</button>
+        <button class="nav-link" data-screen="setup">Novo simulado</button>
+      </nav>
+      <button id="logoutButton" class="ghost-button">Sair</button>
     </header>
 
-    <div class="progresso">
-      <div id="barra"></div>
-    </div>
+    <main>
+      <section id="dashboardScreen" class="screen active">
+        <div class="page-head">
+          <div>
+            <span class="eyebrow">PAINEL DE DESEMPENHO</span>
+            <h1>Estude pelo que mais precisa.</h1>
+            <p>Acompanhe sua evolução pelo método de pontuação CEBRASPE.</p>
+          </div>
+          <button class="button button-primary" data-screen="setup">Criar simulado</button>
+        </div>
 
-    <section class="card">
-      <h3 id="perguntaTexto">Pergunta</h3>
+        <div class="stat-grid" aria-label="Resumo do desempenho">
+          <article class="stat-card accent">
+            <span>Pontuação líquida</span>
+            <strong id="totalScore">0</strong>
+            <small>acerto +1 · erro −1</small>
+          </article>
+          <article class="stat-card">
+            <span>Questões respondidas</span>
+            <strong id="totalAnswered">0</strong>
+            <small id="totalSimulados">0 simulados concluídos</small>
+          </article>
+          <article class="stat-card">
+            <span>Taxa de acertos</span>
+            <strong id="accuracyRate">0%</strong>
+            <small>sem descontar os erros</small>
+          </article>
+          <article class="stat-card">
+            <span>Melhor matéria</span>
+            <strong id="bestSubject">—</strong>
+            <small id="bestSubjectDetail">Faça seu primeiro simulado</small>
+          </article>
+        </div>
 
-      <div id="alternativas" class="alternativas"></div>
-    </section>
+        <div class="dashboard-grid">
+          <article class="panel">
+            <div class="panel-head">
+              <div><span class="eyebrow">POR ASSUNTO</span><h2>Onde concentrar a revisão</h2></div>
+              <span class="legend"><i></i> Acertos</span>
+            </div>
+            <div id="topicPerformance" class="topic-performance empty-state">
+              <p>Conclua um simulado para visualizar seu desempenho detalhado.</p>
+            </div>
+          </article>
 
-  </section>
+          <article class="panel history-panel">
+            <div class="panel-head">
+              <div><span class="eyebrow">HISTÓRICO</span><h2>Últimos simulados</h2></div>
+              <button id="clearHistoryButton" class="text-button hidden">Limpar</button>
+            </div>
+            <div id="historyList" class="history-list empty-state">
+              <p>Nenhum simulado concluído ainda.</p>
+            </div>
+          </article>
+        </div>
+      </section>
 
-  <!-- RESULTADO -->
-  <section id="resultado" class="screen">
+      <section id="setupScreen" class="screen">
+        <div class="page-head compact">
+          <div>
+            <span class="eyebrow">NOVO SIMULADO</span>
+            <h1>Monte sua prova.</h1>
+            <p>Filtre o banco e gere uma seleção inédita para esta tentativa.</p>
+          </div>
+        </div>
 
-    <div class="resultado-card">
+        <div class="setup-layout">
+          <form id="setupForm" class="panel setup-form">
+            <div class="field">
+              <label for="subjectFilter">Matéria</label>
+              <select id="subjectFilter">
+                <option value="Todas">Todas as matérias</option>
+                <option value="Português">Português</option>
+                <option value="Direito Constitucional">Direito Constitucional</option>
+                <option value="Direito Administrativo">Direito Administrativo</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="topicFilter">Assunto</label>
+              <select id="topicFilter"><option value="Todos">Todos os assuntos</option></select>
+            </div>
+            <div class="field">
+              <label for="difficultyFilter">Dificuldade</label>
+              <select id="difficultyFilter">
+                <option value="Todas">Mista</option>
+                <option value="Fácil">Fácil</option>
+                <option value="Médio">Médio</option>
+                <option value="Difícil">Difícil</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="questionCount">Quantidade</label>
+              <select id="questionCount">
+                <option value="10">10 questões</option>
+                <option value="20" selected>20 questões</option>
+                <option value="30">30 questões</option>
+                <option value="all">Todas as disponíveis</option>
+              </select>
+            </div>
+            <div class="field field-wide">
+              <div class="switch-row">
+                <div><label for="timerToggle">Cronômetro</label><small>Tempo total sugerido: 90 segundos por item.</small></div>
+                <label class="switch"><input id="timerToggle" type="checkbox" checked><span></span></label>
+              </div>
+            </div>
+            <div id="availability" class="availability field-wide"></div>
+            <button class="button button-primary field-wide" type="submit">Iniciar simulado</button>
+          </form>
 
-      <span class="badge">Resultado final</span>
+          <aside class="panel rules-card">
+            <span class="eyebrow">REGRA CEBRASPE</span>
+            <h2>Uma errada anula uma certa.</h2>
+            <div class="rule-row"><strong>+1</strong><span>Resposta correta</span></div>
+            <div class="rule-row negative"><strong>−1</strong><span>Resposta incorreta</span></div>
+            <div class="rule-row neutral"><strong>0</strong><span>Item em branco</span></div>
+            <p>Você pode navegar entre os itens antes de concluir. A correção comentada só aparece no final.</p>
+          </aside>
+        </div>
+      </section>
 
-      <h2 id="resultadoTitulo">Você terminou!</h2>
+      <section id="quizScreen" class="screen">
+        <header class="quiz-head">
+          <div>
+            <button id="exitQuizButton" class="ghost-button back-button">← Sair</button>
+            <span id="quizMeta">Simulado BACEN</span>
+          </div>
+          <div class="quiz-status">
+            <span id="answeredCount">0/20 respondidas</span>
+            <strong id="timerDisplay">30:00</strong>
+          </div>
+        </header>
 
-      <p id="resultadoTexto"></p>
+        <div class="progress"><span id="progressBar"></span></div>
 
-      <div class="resultado-numero">
-        <span id="resultadoAcertos">0</span>/15
+        <div class="quiz-layout">
+          <article class="question-card">
+            <div class="question-meta">
+              <span id="questionNumber" class="number-chip">01</span>
+              <span id="questionTags"></span>
+            </div>
+            <p id="questionText" class="question-text"></p>
+            <div class="answer-grid" role="group" aria-label="Escolha a resposta">
+              <button class="answer-button correct-choice" data-answer="true"><span>C</span>Certo</button>
+              <button class="answer-button wrong-choice" data-answer="false"><span>E</span>Errado</button>
+              <button class="answer-button blank-choice" data-answer="blank"><span>—</span>Em branco</button>
+            </div>
+            <footer class="question-actions">
+              <button id="previousButton" class="button button-secondary">Anterior</button>
+              <button id="nextButton" class="button button-primary">Próxima</button>
+            </footer>
+          </article>
+
+          <aside class="panel navigator-panel">
+            <div class="panel-head"><div><span class="eyebrow">NAVEGAÇÃO</span><h2>Itens</h2></div></div>
+            <div id="questionNavigator" class="question-navigator"></div>
+            <div class="navigator-legend"><span><i class="done"></i>Respondida</span><span><i></i>Em branco</span></div>
+            <button id="finishButton" class="button button-primary button-full">Concluir simulado</button>
+          </aside>
+        </div>
+      </section>
+
+      <section id="resultScreen" class="screen">
+        <div class="page-head">
+          <div>
+            <span class="eyebrow">RESULTADO</span>
+            <h1>Simulado concluído.</h1>
+            <p id="resultSubtitle"></p>
+          </div>
+          <button class="button button-primary" data-screen="setup">Novo simulado</button>
+        </div>
+
+        <div class="result-summary">
+          <article class="score-card">
+            <span>PONTUAÇÃO LÍQUIDA</span>
+            <strong id="resultScore">0</strong>
+            <small id="resultMax">de 20 pontos possíveis</small>
+          </article>
+          <article><span>Corretas</span><strong id="resultCorrect" class="positive-text">0</strong></article>
+          <article><span>Erradas</span><strong id="resultWrong" class="negative-text">0</strong></article>
+          <article><span>Em branco</span><strong id="resultBlank">0</strong></article>
+          <article><span>Aproveitamento</span><strong id="resultAccuracy">0%</strong></article>
+        </div>
+
+        <article class="panel review-panel">
+          <div class="panel-head">
+            <div><span class="eyebrow">CORREÇÃO COMENTADA</span><h2>Revisão item a item</h2></div>
+            <select id="reviewFilter" aria-label="Filtrar correção">
+              <option value="all">Todas</option>
+              <option value="wrong">Erradas</option>
+              <option value="correct">Corretas</option>
+              <option value="blank">Em branco</option>
+            </select>
+          </div>
+          <div id="reviewList" class="review-list"></div>
+        </article>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span>Foco BACEN · Simulador independente</span>
+      <span>Base normativa: CF/88, Lei 9.784/1999 e Lei 14.133/2021</span>
+    </footer>
+  </div>
+
+  <dialog id="confirmDialog" class="dialog">
+    <form method="dialog">
+      <span class="eyebrow">CONFIRMAR</span>
+      <h2 id="dialogTitle">Concluir simulado?</h2>
+      <p id="dialogText"></p>
+      <div class="dialog-actions">
+        <button value="cancel" class="button button-secondary">Continuar respondendo</button>
+        <button id="confirmFinishButton" value="confirm" class="button button-primary">Concluir agora</button>
       </div>
+    </form>
+  </dialog>
 
-      <div class="rank-box">
-        <p>Seu rank</p>
-
-        <h3 id="rankFinal">Bronze</h3>
-
-        <span id="xpFinal">+0 XP</span>
-      </div>
-
-      <p class="recorde">
-        Melhor pontuação:
-        <span id="melhorPontuacao">0</span> pts
-      </p>
-
-      <div id="revisao" class="revisao"></div>
-
-      <button onclick="reiniciarQuiz()">
-        Jogar novamente
-      </button>
-
-      <button class="secundario" onclick="voltarHome()">
-        Escolher outra categoria
-      </button>
-
-    </div>
-
-  </section>
-
-</main>
-
-<script src="script.js"></script>
-
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="script.js"></script>
 </body>
 </html>
