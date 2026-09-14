@@ -595,11 +595,19 @@ function escapeHtml(value) {
 }
 
 async function hashPassword(value) {
-  const bytes = new TextEncoder().encode(value);
-  const hash = await crypto.subtle.digest("SHA-256", bytes);
-  return Array.from(new Uint8Array(hash)).map(function(byte) {
-    return byte.toString(16).padStart(2, "0");
-  }).join("");
+  if (window.crypto && window.crypto.subtle && window.TextEncoder) {
+    const bytes = new TextEncoder().encode(value);
+    const hash = await window.crypto.subtle.digest("SHA-256", bytes);
+    return Array.from(new Uint8Array(hash)).map(function(byte) {
+      return byte.toString(16).padStart(2, "0");
+    }).join("");
+  }
+  let hash = 2166136261;
+  for (let index = 0; index < value.length; index += 1) {
+    hash ^= value.charCodeAt(index);
+    hash = Math.imul(hash, 16777619);
+  }
+  return "local-" + (hash >>> 0).toString(16);
 }
 
 function showToast(message) {
@@ -624,6 +632,12 @@ function prepareLogin() {
     input.placeholder = "Crie uma senha com 6 ou mais caracteres";
     input.autocomplete = "new-password";
     submit.textContent = "Criar senha e entrar";
+  } else {
+    title.textContent = "Seu foco é o BACEN.";
+    description.textContent = "Acesse seu ambiente de simulados para Técnico.";
+    input.placeholder = "Digite sua senha";
+    input.autocomplete = "current-password";
+    submit.textContent = "Entrar no simulador";
   }
 }
 
@@ -675,6 +689,7 @@ $("#logoutButton").addEventListener("click", function() {
   $("#app").classList.add("hidden");
   $("#loginScreen").classList.remove("hidden");
   $("#password").value = "";
+  prepareLogin();
   $("#password").focus();
 });
 
@@ -968,9 +983,11 @@ function renderNavigator() {
 }
 
 function openDialog(action, title, text) {
+  const labels = {finish:"Concluir agora", abandon:"Sair sem salvar", clear:"Limpar histórico"};
   pendingDialogAction = action;
   $("#dialogTitle").textContent = title;
   $("#dialogText").textContent = text;
+  $("#confirmFinishButton").textContent = labels[action] || "Confirmar";
   $("#confirmDialog").showModal();
 }
 
@@ -1021,6 +1038,7 @@ function finishQuiz() {
     }
     return {
       id: question.id,
+      position: index + 1,
       subject: question.subject,
       topic: question.topic,
       difficulty: question.difficulty,
@@ -1082,7 +1100,7 @@ function renderReview(filter) {
     const given = item.userAnswer === true ? "Certo" : item.userAnswer === false ? "Errado" : "Em branco";
     const expected = item.correctAnswer ? "Certo" : "Errado";
     return '<article class="review-item ' + item.result + '">' +
-      '<div class="review-top"><span>ITEM ' + String(index + 1).padStart(2, "0") + ' · ' + escapeHtml(item.subject) + ' · ' + escapeHtml(item.topic) + '</span><span class="review-status">' + labels[item.result] + '</span></div>' +
+      '<div class="review-top"><span>ITEM ' + String(item.position || index + 1).padStart(2, "0") + ' · ' + escapeHtml(item.subject) + ' · ' + escapeHtml(item.topic) + '</span><span class="review-status">' + labels[item.result] + '</span></div>' +
       '<p>' + escapeHtml(item.statement) + '</p>' +
       '<div class="answer-line"><span>Sua resposta: <strong>' + given + '</strong></span><span>Gabarito: <strong>' + expected + '</strong></span></div>' +
       '<div class="commentary"><strong>Comentário:</strong> ' + escapeHtml(item.comment) + '</div>' +
